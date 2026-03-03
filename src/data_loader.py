@@ -1,30 +1,24 @@
 import tensorflow as tf
-import os
+from pathlib import Path
 
-def load_and_preprocess_image(path, label, target_size=(512,512)):
-    image = tf.io.read_file(path)
-    image = tf.image.decode_jpeg(image, channels=1)
-    image = tf.image.resize(image, target_size)
-    image = image / 255.0
-
-    return image, label
-
-def get_dataset(data_dir, batch_size = 32, is_training = True):
-    classes = ['def_front', 'ok_front']
+def get_file_lists(data_dir_name = 'data/original'):
+    classes = ['def_front','ok_front']
     file_paths = []
     labels = []
+
+    current_dir = Path(__file__).parent.resolve()
+    repo_root = current_dir.parent
+
+    base_path = repo_root / data_dir_name
+
     for idx, label in enumerate(classes):
-        class_path = os.path.join(data_dir, label)
-        for filename in os.listdir(class_path):
-            if filename.endswith('.jpeg'):
-                file_paths.append(os.path.join(class_path, filename))
-                labels.append(idx)
+        class_path = base_path / label
 
-    ds = tf.data.Dataset.from_tensor_slices((file_paths, labels))
-    ds = ds.map(lambda p, l: load_and_preprocess_image(p, l), num_parallel_calls=tf.data.AUTOTUNE)
+        if not class_path.exists():
+            print("Cartella non trovata.")
 
-    if is_training:
-        ds = ds.shuffle(buffer_size=len(file_paths))
-
-    ds = ds.batch(batch_size).prefetch(buffer_size=tf.data.AUTOTUNE)
-    return ds
+        images = list(class_path.glob('*.jpeg'))
+        for img_path in images:
+            file_paths.append(str(img_path))
+            labels.append(idx)
+    return file_paths, labels
