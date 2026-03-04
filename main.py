@@ -3,6 +3,7 @@ from src.data_processer import prepare_dataset
 from src.data_augmenter import get_augmenter, apply_augmentation
 from src.model import build_model
 from src.train import train
+from src.evaluator import evaluate_model
 from sklearn.model_selection import train_test_split
 import numpy as np
 
@@ -17,8 +18,11 @@ def main():
         paths, labels, test_size=0.2, random_state=42, stratify=labels
     )
 
+    test_paths, test_labels = get_file_lists("data/processed/test")
+
     train_ds = prepare_dataset(train_paths, train_labels, batch_size=32, shuffle=True)
     val_ds = prepare_dataset(val_paths, val_labels, batch_size=32, shuffle=False)
+    test_ds = prepare_dataset(test_paths, test_labels, batch_size=32, shuffle=False)
 
     #Data Augmentation
     #Opzionale
@@ -32,16 +36,18 @@ def main():
     weight_for_ok = (1 / pos) * (total / 2.0)
     class_weight = {0: weight_for_def, 1: weight_for_ok}
 
-    model = build_model(input_shape=(300,300,1))
+    model = build_model(input_shape=(300,300,1), reduction_layer='gmp2d')
     model.summary()
 
     history = train(
         model,
         train_ds,
         val_ds,
-        epochs=20,
+        epochs=10,
         learning_rate=0.001
     )
+
+    evaluate_model('model/best_model.keras', test_ds)
 
 if __name__ == "__main__":
     main()
