@@ -1,19 +1,13 @@
+import numpy as np
+from sklearn.model_selection import train_test_split
 from src.data_loader import get_file_lists
 from src.data_processer import prepare_dataset
-from src.data_augmenter import get_augmenter, apply_augmentation
-from src.model import build_model
-from src.train import train
-from src.evaluator import evaluate_model
-from sklearn.model_selection import train_test_split
-import numpy as np
+from src.experiment_handler import run_experiment
 
 def main():
     paths, labels = get_file_lists("data/processed/train")
-
     if not paths:
-        print("No data found")
         return
-
     train_paths, val_paths, train_labels, val_labels = train_test_split(
         paths, labels, test_size=0.2, random_state=42, stratify=labels
     )
@@ -24,30 +18,22 @@ def main():
     val_ds = prepare_dataset(val_paths, val_labels, batch_size=32, shuffle=False)
     test_ds = prepare_dataset(test_paths, test_labels, batch_size=32, shuffle=False)
 
-    #Data Augmentation
-    #Opzionale
-
-    #augmenter = get_augmenter()
-    #train_ds = apply_augmentation(train_ds, augmenter)
-
+    #TODO: maybe this is better in the processer component
     neg, pos = np.bincount(labels)
     total = neg + pos
-    weight_for_def = (1 / neg) * (total / 2.0)
-    weight_for_ok = (1 / pos) * (total / 2.0)
-    class_weight = {0: weight_for_def, 1: weight_for_ok}
+    class_weight = {
+        0: (1 / neg) * (total / 2.0),
+        1: (1 / pos) * (total / 2.0)
+    }
 
-    model = build_model(input_shape=(300,300,1), reduction_layer='gmp2d')
-    model.summary()
-
-    history = train(
-        model,
-        train_ds,
-        val_ds,
-        epochs=10,
-        learning_rate=0.001
-    )
-
-    evaluate_model('model/best_model.keras', test_ds)
+    #TODO: maybe add this to a configuration file? Like config.json
+    experiments = [
+        {'name': 'ModelA', 'arch': 'mlp', 'red': None, 'epochs': 10},
+        {'name': 'ModelB', 'arch': 'cnn', 'red': 'gap2d', 'epochs': 10},
+        {'name' : 'ModelC', 'arch': 'cnn', 'red': 'gmp2d', 'epochs': 10},
+        {'name': 'ModelD', 'arch': 'cnn', 'red': 'flatten', 'epochs': 10},
+    ]
+    run_experiment(experiments, train_ds, val_ds, test_ds)
 
 if __name__ == "__main__":
     main()

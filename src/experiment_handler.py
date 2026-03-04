@@ -1,16 +1,19 @@
 import os
-from model import build_model
-from train import train
-from evaluator import evaluate_model
+from src.model import build_model
+from src.train import train
+from src.evaluator import evaluate_model
 
 def run_experiment(experiments, train_ds, val_ds, test_ds):
     for exp in experiments:
         print(f"Running experiment {exp['name']}")
+        print(exp)
 
         model = build_model(
             architecture=exp['arch'],
             reduction_layer=exp['red']
         )
+
+        model.summary()
 
         train(model, train_ds, val_ds, epochs=exp['epochs'])
 
