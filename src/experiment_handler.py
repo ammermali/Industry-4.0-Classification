@@ -3,7 +3,7 @@ from src.model import build_model
 from src.train import train
 from src.evaluator import evaluate_model
 
-def run_experiment(experiments, train_ds, val_ds, test_ds):
+def run_experiment(experiments, train_ds, val_ds, test_ds, class_weights=None):
     for exp in experiments:
         print(f"Running experiment {exp['name']}")
         print(exp)
@@ -15,15 +15,14 @@ def run_experiment(experiments, train_ds, val_ds, test_ds):
 
         model.summary()
 
-        train(model, train_ds, val_ds, epochs=exp['epochs'])
+        train(model,
+              train_ds,
+              val_ds,
+              epochs=exp['epochs'],
+              class_weights=class_weights,
+              exp_name=exp['name']
+              )
 
         model_path = f"model/{exp['name']}.keras"
-        if os.path.exists('reports/confusion_matrix.png'):
-            os.rename("model/best_model.keras", model_path)
-
-        evaluate_model_and_save(model_path, test_ds, exp['name'])
-
-def evaluate_model_and_save(model_path, test_ds, name):
-    evaluate_model(model_path, test_ds)
-    if os.path.exists('reports/confusion_matrix.png'):
-        os.rename("reports/confusion_matrix.png", f'reports/{name}_matrix.png')
+        matrix_save_path = f"logs/{exp['name']}/confusion_matrix.png"
+        evaluate_model(model_path, test_ds, save_path=matrix_save_path)

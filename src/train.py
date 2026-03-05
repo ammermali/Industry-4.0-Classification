@@ -1,9 +1,14 @@
+import os
+
 import tensorflow as tf
 from tensorflow.keras import optimizers, losses, metrics
 
 # The only responsibility of this component is to converge the loss function.
 
-def train(model, train_ds, val_ds, epochs=10, learning_rate=0.001):
+def train(model, train_ds, val_ds, epochs=10, learning_rate=0.001, class_weights = None, exp_name="best_model"):
+    os.makedirs('model', exist_ok=True)
+    os.makedirs(f'logs/{exp_name}', exist_ok=True)
+
     model.compile(
         optimizer=optimizers.Adam(learning_rate=learning_rate),
         loss=losses.BinaryCrossentropy(),
@@ -16,7 +21,7 @@ def train(model, train_ds, val_ds, epochs=10, learning_rate=0.001):
 
     run_callbacks = [
         tf.keras.callbacks.ModelCheckpoint(
-            filepath='model/best_model.keras',
+            filepath=f'model/{exp_name}.keras',
             monitor='val_loss',
             save_best_only=True,
             verbose=1
@@ -31,6 +36,9 @@ def train(model, train_ds, val_ds, epochs=10, learning_rate=0.001):
             monitor='val_loss',
             patience=7,
             restore_best_weights=True
+        ),
+        tf.keras.callbacks.CSVLogger(
+            f'logs/{exp_name}/history.csv',
         )
     ]
 
@@ -39,6 +47,7 @@ def train(model, train_ds, val_ds, epochs=10, learning_rate=0.001):
         validation_data=val_ds,
         epochs=epochs,
         callbacks=run_callbacks,
+        class_weight=class_weights,
         verbose=1
     )
 

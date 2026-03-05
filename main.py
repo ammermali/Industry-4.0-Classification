@@ -33,7 +33,7 @@ def main():
         {'name' : 'ModelC', 'arch': 'cnn', 'red': 'gmp2d', 'epochs': 10},
         {'name': 'ModelD', 'arch': 'cnn', 'red': 'flatten', 'epochs': 10},
     ]
-    run_experiment(experiments, train_ds, val_ds, test_ds)
+    run_experiment(experiments, train_ds, val_ds, test_ds, class_weight)
 
 if __name__ == "__main__":
     main()

@@ -5,7 +5,8 @@ import seaborn as sns
 from sklearn.metrics import confusion_matrix, classification_report
 import os
 
-def evaluate_model(model_path, test_ds):
+
+def evaluate_model(model_path, test_ds, save_path = None):
     if not os.path.exists(model_path):
         print("Model not found")
         return
@@ -27,10 +28,10 @@ def evaluate_model(model_path, test_ds):
 
     print(classification_report(y_true, y_pred, target_names=['DEF', 'OK']))
 
-    cm = confusion_matrix(y_true, y_pred)
+    matrix = confusion_matrix(y_true, y_pred)
 
     plt.figure(figsize=(8,6))
-    sns.heatmap(cm, annot=True, fmt='d', cmap='Blues',
+    sns.heatmap(matrix, annot=True, fmt='d', cmap='Blues',
                 xticklabels=['Predicted DEF','Predicted OK'],
                 yticklabels=['Actual DEF','Actual OK'])
 
@@ -38,8 +39,11 @@ def evaluate_model(model_path, test_ds):
     plt.ylabel('True label')
     plt.xlabel('Predicted label')
 
-    os.makedirs('reports', exist_ok=True)
-    plt.savefig('reports\confusion_matrix.png')
-    plt.show()
+    if save_path:
+        os.makedirs(os.path.dirname(save_path), exist_ok=True)
+        plt.savefig(save_path)
+        print(f"Confusion matrix saved to {save_path}")
 
+    plt.show()
+    plt.close()
     return y_true, y_pred
