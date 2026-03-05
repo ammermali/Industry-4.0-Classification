@@ -1,12 +1,19 @@
 import os
-
 import tensorflow as tf
 from tensorflow.keras import optimizers, losses, metrics
+import time
+
+class EpochTimer(tf.keras.callbacks.Callback):
+    def on_epoch_begin(self, epoch, logs=None):
+        self.start_time = time.time()
+
+    def on_epoch_end(self, epoch, logs=None):
+        logs['epoch_time'] = time.time() - self.start_time
 
 # The only responsibility of this component is to converge the loss function.
 
 def train(model, train_ds, val_ds, epochs=10, learning_rate=0.001, class_weights = None, exp_name="best_model"):
-    os.makedirs('model', exist_ok=True)
+    os.makedirs('models', exist_ok=True)
     os.makedirs(f'logs/{exp_name}', exist_ok=True)
 
     model.compile(
@@ -20,8 +27,9 @@ def train(model, train_ds, val_ds, epochs=10, learning_rate=0.001, class_weights
     )
 
     run_callbacks = [
+        EpochTimer(),
         tf.keras.callbacks.ModelCheckpoint(
-            filepath=f'model/{exp_name}.keras',
+            filepath=f'models/{exp_name}.keras',
             monitor='val_loss',
             save_best_only=True,
             verbose=1

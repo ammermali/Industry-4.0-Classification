@@ -1,4 +1,3 @@
-import tensorflow as tf
 from pathlib import Path
 
 def get_file_lists(data_dir_name = 'data/original'):

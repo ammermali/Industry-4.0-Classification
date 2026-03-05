@@ -44,6 +44,5 @@ def evaluate_model(model_path, test_ds, save_path = None):
         plt.savefig(save_path)
         print(f"Confusion matrix saved to {save_path}")
 
-    plt.show()
     plt.close()
     return y_true, y_pred

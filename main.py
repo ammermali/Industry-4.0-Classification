@@ -3,6 +3,7 @@ from sklearn.model_selection import train_test_split
 from src.data_loader import get_file_lists
 from src.data_processer import prepare_dataset
 from src.experiment_handler import run_experiment
+from src.plotter import plot_models
 
 def main():
     paths, labels = get_file_lists("data/processed/train")
@@ -34,6 +35,8 @@ def main():
         {'name': 'ModelD', 'arch': 'cnn', 'red': 'flatten', 'epochs': 10},
     ]
     run_experiment(experiments, train_ds, val_ds, test_ds, class_weight)
+
+    plot_models(experiments)
 
 if __name__ == "__main__":
     main()
