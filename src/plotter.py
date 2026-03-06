@@ -23,21 +23,28 @@ def plot_models(experiments):
             continue
         df = pd.read_csv(csv_path)
         epochs = range(1, len(df) + 1)
-        ax1.plot(epochs, df['loss'], label=f'{name}', linewidth=2)
-        ax2.plot(epochs, df['val_accuracy'], label=f'{name}', linewidth=2, linestyle='--')
+        line = ax1.plot(epochs, df['loss'], label=f'{name} Train', linewidth=2)
+        color = line[0].get_color()
+        ax1.plot(epochs, df['val_loss'], color = color, label=f'{name} Val', linewidth=2, linestyle='--')
+        ax2.plot(epochs, df['accuracy'], color = color, label=f'{name} Train', linewidth=2)
+        ax2.plot(epochs, df['val_accuracy'], color = color, label=f'{name} Val', linewidth=2, linestyle='--')
         if 'epoch_time' in df.columns:
-            total_duration = df['epoch_time'].sum()
-            summary_table.append([name, f"{total_duration:.2f}s"])
+            duration = df['epoch_time'].sum()
+            minutes = int(duration // 60)
+            seconds = int(duration % 60)
+            time_str = f"{minutes}m {seconds}s"
+            summary_table.append([name, time_str])
         else:
             summary_table.append([name, "N/A"])
-    ax1.set_title('Training Loss Comparison', fontsize=14)
+
+    ax1.set_title('Loss Comparison', fontsize=14)
     ax1.set_xlabel('Epoch')
     ax1.set_ylabel('Loss')
     ax1.grid(True, linestyle=':', alpha=0.7)
     ax1.legend()
-    ax2.set_title('Validation Accuracy Comparison', fontsize=14)
+    ax2.set_title('Accuracy Comparison', fontsize=14)
     ax2.set_xlabel('Epoch')
-    ax2.set_ylabel('Accuracy')
+    ax2.set_ylabel('Loss')
     ax2.grid(True, linestyle=':', alpha=0.7)
     ax2.legend()
 

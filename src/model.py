@@ -3,13 +3,17 @@ from tensorflow.keras import layers, models
 
 #Component that defines and builds the structure of the model.
 
-def build_model(input_shape=(300,300,1), dropout_rate=0.3, architecture='cnn', reduction_layer='gap2d'):
+def build_model(input_shape=(300,300,1), dropout_rate=0.5, architecture='cnn', reduction_layer='gap2d'):
     model = models.Sequential()
     match architecture:
         case 'cnn':
-            model.add(layers.Conv2D(32, (3,3), activation='relu', input_shape=input_shape))
+            model.add(layers.Conv2D(32, (5,5), strides=2, padding='same', activation='relu', input_shape=input_shape))
+            model.add(layers.BatchNormalization())
+            model.add(layers.MaxPooling2D((3,3)))
+            model.add(layers.Conv2D(64, (3,3), padding='same', activation='relu'))
+            model.add(layers.BatchNormalization())
             model.add(layers.MaxPooling2D((2,2)))
-            model.add(layers.Conv2D(64, (3,3), activation='relu'))
+            model.add(layers.Conv2D(128, (3,3), padding='same', activation='relu'))
             model.add(layers.BatchNormalization())
             model.add(layers.MaxPooling2D((2,2)))
             match reduction_layer:
@@ -26,10 +30,14 @@ def build_model(input_shape=(300,300,1), dropout_rate=0.3, architecture='cnn', r
 
         case 'mlp':
             model.add(layers.Flatten(input_shape=input_shape))
+            model.add(layers.Dense(256))
             model.add(layers.BatchNormalization())
             model.add(layers.Activation('relu'))
             model.add(layers.Dropout(dropout_rate))
-            model.add(layers.Dense(128, activation='relu'))
+            model.add(layers.Dense(64))
+            model.add(layers.BatchNormalization())
+            model.add(layers.Activation('relu'))
             model.add(layers.Dropout(dropout_rate))
+            model.add(layers.Dense(16, activation='relu'))
             model.add(layers.Dense(1, activation='sigmoid'))
             return model

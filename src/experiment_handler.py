@@ -2,7 +2,7 @@ from src.model import build_model
 from src.train import train
 from src.evaluator import evaluate_model
 
-def run_experiment(experiments, train_ds, val_ds, test_ds, class_weights=None):
+def run_experiment(experiments, train_ds, val_ds, test_ds):
     for exp in experiments:
         print(f"Running experiment {exp['name']}")
         print(exp)
@@ -18,7 +18,6 @@ def run_experiment(experiments, train_ds, val_ds, test_ds, class_weights=None):
               train_ds,
               val_ds,
               epochs=exp['epochs'],
-              class_weights=class_weights,
               exp_name=exp['name']
               )
 
