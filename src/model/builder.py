@@ -14,14 +14,17 @@ class ModelBuilder:
         model.add(layers.Input(shape=self.input_shape))
         match architecture:
             case 'cnn':
-                model.add(layers.Conv2D(32, (3,3), strides=2, padding='same', activation='relu', kernel_regularizer=self.l2))
+                model.add(layers.Conv2D(32, (3,3), strides=2, padding='same', kernel_regularizer=self.l2))
                 model.add(layers.BatchNormalization())
-                model.add(layers.MaxPooling2D((2,2))) # 150 x 150
-                model.add(layers.Conv2D(64, (3,3), padding='same', activation='relu', kernel_regularizer=self.l2))
+                model.add(layers.Activation('relu'))
+                model.add(layers.MaxPooling2D((4,4))) # 150 x 150
+                model.add(layers.Conv2D(64, (3,3), padding='same', kernel_regularizer=self.l2))
                 model.add(layers.BatchNormalization())
-                model.add(layers.MaxPooling2D((4,4)))
-                model.add(layers.Conv2D(128, (3,3), padding='same', activation='relu', kernel_regularizer=self.l2))
+                model.add(layers.Activation('relu'))
+                model.add(layers.MaxPooling2D((3,3)))
+                model.add(layers.Conv2D(128, (3,3), padding='same', kernel_regularizer=self.l2))
                 model.add(layers.BatchNormalization())
+                model.add(layers.Activation('relu'))
                 model.add(layers.MaxPooling2D((3,3)))
                 match reduction_layer:
                     case 'gap2d':
@@ -30,7 +33,7 @@ class ModelBuilder:
                         model.add(layers.Flatten())
                     case 'gmp2d':
                         model.add(layers.GlobalMaxPooling2D())
-                model.add(layers.Dense(128, activation='relu', kernel_regularizer=self.l2))
+                model.add(layers.Dense(64, activation='relu', kernel_regularizer=self.l2))
                 model.add(layers.Dropout(self.dropout_rate))
 
             case 'mlp':
@@ -45,5 +48,5 @@ class ModelBuilder:
                 model.add(layers.Dropout(self.dropout_rate))
                 model.add(layers.Dense(16, activation='relu'))
 
-        model.add(layers.Dense(1, activation='sigmoid'))
+        model.add(layers.Dense(1, activation='sigmoid', dtype='float32'))
         return model
