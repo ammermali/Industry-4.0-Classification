@@ -43,6 +43,7 @@ class ExperimentHandler:
                 reduction_layer=exp['red']
             )
 
+            model.summary()
             engine = ModelEngine(model)
             engine.compile_model(learning_rate=self.config.get('lr', 0.0001))
             engine.train(train_ds, val_ds, epochs=self.epochs, exp_name=exp['name'])

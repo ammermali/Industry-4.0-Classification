@@ -4,7 +4,7 @@ from tensorflow.keras import layers, models, regularizers
 #Component that defines and builds the structure of the model.
 
 class ModelBuilder:
-    def __init__(self, input_shape=(300,300,1), dropout_rate=0.5):
+    def __init__(self, input_shape=(300,300,1), dropout_rate=0.4):
         self.input_shape = input_shape
         self.dropout_rate = dropout_rate
         self.l2 = regularizers.l2(0.0001)

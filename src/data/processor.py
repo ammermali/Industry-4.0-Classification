@@ -11,7 +11,7 @@ class DataProcessor():
         img = tf.io.read_file(file_path)
         img = tf.image.decode_jpeg(img, channels=1)
         img = tf.image.resize(img, self.img_size)
-        img = tf.cast(img, tf.float32) / 127.5 - 1 # [-1,1]
+        img = tf.cast(img, tf.float32) / 255.0
         return img, label
 
     def get_augmenter(self):
