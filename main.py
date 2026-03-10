@@ -1,40 +1,66 @@
-from sklearn.model_selection import train_test_split
-from src.data_loader import get_file_lists
-from src.data_processer import prepare_dataset
-from src.data_augmenter import apply_augmentation, get_augmenter
-from src.experiment_handler import run_experiment
-from src.plotter import plot_models
+import os
+os.environ['TF_CPP_MIN_LOG_LEVEL'] = '3'
+import argparse
+import sys
+from src.experiment_handler import ExperimentHandler
 
-EPOCHS = 10
-BATCH_SIZE = 64
+ # This component defines an entry point for the whole system. Both for training and inference.
 
 def main():
-    paths, labels = get_file_lists("data/processed/train")
-    if not paths:
-        return
-    train_paths, val_paths, train_labels, val_labels = train_test_split(
-        paths, labels, test_size=0.2, random_state=42, stratify=labels
+
+    # Args
+    parser = argparse.ArgumentParser(description="Industry 4.0 Cast Defect Detector - Training and Inference")
+    parser.add_argument(
+        '--mode',
+        choices=['train', 'predict'],
+        default='train',
+        help='Mode: train or predict'
     )
 
-    test_paths, test_labels = get_file_lists("data/processed/test")
+    parser.add_argument(
+        '--model_path',
+        type=str,
+        help="Path of the chosen model for inference."
+    )
+    parser.add_argument(
+        '--image_path',
+        type=str,
+        help="Path of the image to predict."
+    )
+    args = parser.parse_args()
 
-    train_ds = prepare_dataset(train_paths, train_labels, batch_size=BATCH_SIZE, shuffle=True)
-    val_ds = prepare_dataset(val_paths, val_labels, batch_size=BATCH_SIZE, shuffle=False)
-    test_ds = prepare_dataset(test_paths, test_labels, batch_size=BATCH_SIZE, shuffle=False)
 
-    augmenter = get_augmenter()
-    train_ds = apply_augmentation(train_ds, augmenter)
+    # Config
+    config = {
+        'batch_size': 64,
+        'lr': 0.001, # learning rate
+        'img_size': (300,300),
+        'epochs': 15
+    }
 
-    #TODO: maybe add this to a configuration file? Like config.json
+    # Experiments
     experiments = [
-    #    {'name': 'ModelA', 'arch': 'mlp', 'red': None, 'epochs': EPOCHS},
-        {'name': 'ModelB', 'arch': 'cnn', 'red': 'gap2d', 'epochs': EPOCHS},
-        {'name' : 'ModelC', 'arch': 'cnn', 'red': 'gmp2d', 'epochs': EPOCHS},
-        {'name': 'ModelD', 'arch': 'cnn', 'red': 'flatten', 'epochs': EPOCHS},
-    ]
-    run_experiment(experiments, train_ds, val_ds, test_ds)
+        {'name': 'ModelA', 'arch': 'mlp', 'red': None},
+        {'name': 'ModelB', 'arch': 'cnn', 'red': 'gap2d'},
+        {'name' : 'ModelC', 'arch': 'cnn', 'red': 'gmp2d'},
+        {'name': 'ModelD', 'arch': 'cnn', 'red': 'flatten'},
 
-    plot_models(experiments)
+    ]
+
+
+    handler = ExperimentHandler(config)
+
+    if args.mode == "train":
+        print(f"Starting training for {len(experiments)} experiments.")
+        handler.run_experiments(experiments)
+
+    elif args.mode == 'predict':
+        if not args.model_path or not args.image_path:
+            parser.error(f"Model_path and image_path are required.")
+        handler.run_experiments(args.model_path, args.image_path)
 
 if __name__ == "__main__":
-    main()
+    try: main()
+    except Exception as e:
+        print(e)
+        sys.exit(1)
