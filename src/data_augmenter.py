@@ -16,4 +16,4 @@ def apply_augmentation(dataset, augmenter, buffer_size=64):
         lambda x, y: (augmenter(x,training=True), y),
         num_parallel_calls=tf.data.AUTOTUNE
     )
-    return dataset.concatenate(augmented_ds).shuffle(buffer_size=buffer_size, reshuffle_each_iteration=True)
+    return augmented_ds

@@ -8,15 +8,15 @@ def build_model(input_shape=(300,300,1), dropout_rate=0.5, architecture='cnn', r
     model = models.Sequential()
     match architecture:
         case 'cnn':
-            model.add(layers.Conv2D(32, (3,3), strides=1, padding='same', activation='relu', input_shape=input_shape, kernel_regularizer=l2))
+            model.add(layers.Conv2D(32, (3,3), strides=2, padding='same', activation='relu', input_shape=input_shape, kernel_regularizer=l2))
             model.add(layers.BatchNormalization())
             model.add(layers.MaxPooling2D((2,2))) # 150 x 150
             model.add(layers.Conv2D(64, (3,3), padding='same', activation='relu', kernel_regularizer=l2))
             model.add(layers.BatchNormalization())
-            model.add(layers.MaxPooling2D((2,2))) # 75 x 75
+            model.add(layers.MaxPooling2D((4,4)))
             model.add(layers.Conv2D(128, (3,3), padding='same', activation='relu', kernel_regularizer=l2))
             model.add(layers.BatchNormalization())
-            model.add(layers.MaxPooling2D((3,3))) # 25 x 25
+            model.add(layers.MaxPooling2D((3,3)))
             match reduction_layer:
                 case 'gap2d':
                     model.add(layers.GlobalAveragePooling2D())

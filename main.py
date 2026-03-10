@@ -27,7 +27,7 @@ def main():
 
     #TODO: maybe add this to a configuration file? Like config.json
     experiments = [
-        {'name': 'ModelA', 'arch': 'mlp', 'red': None, 'epochs': EPOCHS},
+    #    {'name': 'ModelA', 'arch': 'mlp', 'red': None, 'epochs': EPOCHS},
         {'name': 'ModelB', 'arch': 'cnn', 'red': 'gap2d', 'epochs': EPOCHS},
         {'name' : 'ModelC', 'arch': 'cnn', 'red': 'gmp2d', 'epochs': EPOCHS},
         {'name': 'ModelD', 'arch': 'cnn', 'red': 'flatten', 'epochs': EPOCHS},

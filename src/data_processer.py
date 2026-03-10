@@ -4,7 +4,7 @@ def load_and_resize(file_path, label, img_size=(300,300)):
     img = tf.io.read_file(file_path)
     img = tf.image.decode_jpeg(img, channels=1)
     img = tf.image.resize(img, img_size)
-    img = tf.cast(img, tf.float32) / 255.0
+    img = tf.cast(img, tf.float32) / 127.5 - 1 # [-1,1]
     return img, label
 def prepare_dataset(file_paths, labels, batch_size=32, shuffle=True):
     ds = tf.data.Dataset.from_tensor_slices((file_paths, labels))
