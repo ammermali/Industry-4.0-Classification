@@ -40,6 +40,8 @@ def plot_models(experiments):
     ax1.set_title('Loss Comparison', fontsize=14)
     ax1.set_xlabel('Epoch')
     ax1.set_ylabel('Loss')
+    ax2.set_ylim(0, 1.0)
+    ax2.set_yticks([i / 10 for i in range(11)])
     ax1.grid(True, linestyle=':', alpha=0.7)
     ax1.legend()
     ax2.set_title('Accuracy Comparison', fontsize=14)

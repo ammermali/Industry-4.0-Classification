@@ -17,7 +17,7 @@ def train(model, train_ds, val_ds, epochs=10, learning_rate=0.0001, exp_name="be
     os.makedirs(f'logs/{exp_name}', exist_ok=True)
 
     model.compile(
-        optimizer=optimizers.Adam(learning_rate=learning_rate),
+        optimizer=optimizers.Adam(learning_rate=learning_rate, clipnorm=0.1),
         loss=losses.BinaryCrossentropy(),
         metrics=[
             metrics.BinaryAccuracy(name='accuracy'),
@@ -37,7 +37,7 @@ def train(model, train_ds, val_ds, epochs=10, learning_rate=0.0001, exp_name="be
         tf.keras.callbacks.ReduceLROnPlateau(
             monitor='val_loss',
             factor=0.1,
-            patience=2,
+            patience=7,
             min_lr=1e-7
         ),
         tf.keras.callbacks.EarlyStopping(

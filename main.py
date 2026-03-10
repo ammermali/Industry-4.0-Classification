@@ -5,7 +5,8 @@ from src.data_augmenter import apply_augmentation, get_augmenter
 from src.experiment_handler import run_experiment
 from src.plotter import plot_models
 
-EPOCHS = 20
+EPOCHS = 10
+BATCH_SIZE = 64
 
 def main():
     paths, labels = get_file_lists("data/processed/train")
@@ -17,9 +18,9 @@ def main():
 
     test_paths, test_labels = get_file_lists("data/processed/test")
 
-    train_ds = prepare_dataset(train_paths, train_labels, batch_size=32, shuffle=True)
-    val_ds = prepare_dataset(val_paths, val_labels, batch_size=32, shuffle=False)
-    test_ds = prepare_dataset(test_paths, test_labels, batch_size=32, shuffle=False)
+    train_ds = prepare_dataset(train_paths, train_labels, batch_size=BATCH_SIZE, shuffle=True)
+    val_ds = prepare_dataset(val_paths, val_labels, batch_size=BATCH_SIZE, shuffle=False)
+    test_ds = prepare_dataset(test_paths, test_labels, batch_size=BATCH_SIZE, shuffle=False)
 
     augmenter = get_augmenter()
     train_ds = apply_augmentation(train_ds, augmenter)
