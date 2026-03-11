@@ -23,14 +23,14 @@ python main.py --mode train --batch_size <BATCH_SIZE> --lr <LEARNING_RATE> --epo
 
 You can set the parameters for batch_size, learning rate and epochs directly from this command. It's possible to activate the Mixed Precision for faster training too.
 
-It will outputs the models/ folder, containing the trained models and the logs/ folder containing both the raw training history (CSV) and its plotting as well as the confusion matrix obtained through the evaluation of the best model.
+It outputs the models/ folder, containing the trained models and the logs/ folder containing both the raw training history (CSV) and its plotting as well as the confusion matrix obtained through the evaluation of the best model.
 
 ## 3. Instruction for prediction
 
-You can use a specific trained model to predict the class of an image by using the follow command:
+It's possible to use a specific trained model to predict the class of an image by using the follow command:
 
 ```bash
 python main.py --mode predict --model_path <MODEL_PATH> --image_path <IMAGE_PATH>
 ```
 
-It will return the predicted class and the confidence score of the prediction.
+It returns the predicted class and the confidence score of the prediction.
