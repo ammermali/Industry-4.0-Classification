@@ -23,6 +23,11 @@ python main.py --mode train --batch_size <BATCH_SIZE> --lr <LEARNING_RATE> --epo
 
 You can set the parameters for batch_size, learning rate and epochs directly from this command. It's possible to activate the Mixed Precision for faster training too.
 
+**Default** batch_size: 64
+**Default** learning_rate: 0.0001
+**Default** epochs: 20
+
+
 It outputs the models/ folder, containing the trained models and the logs/ folder containing both the raw training history (CSV) and its plotting as well as the confusion matrix obtained through the evaluation of the best model.
 
 ## 3. Instruction for prediction
@@ -34,3 +39,6 @@ python main.py --mode predict --model_path <MODEL_PATH> --image_path <IMAGE_PATH
 ```
 
 It returns the predicted class and the confidence score of the prediction.
+**Default** model_path: ModelC, as it is the one that showed the best results in the evaluation phase. 
+
+**Warning**: ModelB and ModelD are highly unrecommended as they have shown instability in the training phase.
