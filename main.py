@@ -45,6 +45,7 @@ def main():
     parser.add_argument(
         '--model_path',
         type=str,
+        default='models/ModelC.keras',
         help="Path of the chosen model for inference. Only for predict mode."
     )
     parser.add_argument(

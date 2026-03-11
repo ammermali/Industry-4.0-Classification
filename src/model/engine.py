@@ -26,7 +26,7 @@ class ModelEngine:
         )
 
     def train(self, train_ds, val_ds, epochs=10, exp_name="Model"):
-        os.makedirs(f'models/{exp_name}', exist_ok=True)
+        os.makedirs(f'models', exist_ok=True)
         os.makedirs(f'logs/{exp_name}', exist_ok=True)
 
         callbacks = [
