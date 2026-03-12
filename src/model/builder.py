@@ -14,18 +14,18 @@ class ModelBuilder:
         model.add(layers.Input(shape=self.input_shape))
         match architecture:
             case 'cnn':
-                model.add(layers.Conv2D(32, (3,3), strides=2, padding='same', kernel_regularizer=self.l2))
+                model.add(layers.Conv2D(32, (3,3), padding='same'))
                 model.add(layers.BatchNormalization())
                 model.add(layers.Activation('relu'))
-                model.add(layers.MaxPooling2D((4,4))) # 150 x 150
-                model.add(layers.Conv2D(64, (3,3), padding='same', kernel_regularizer=self.l2))
+                model.add(layers.MaxPooling2D((2,2)))
+                model.add(layers.Conv2D(64, (3,3), padding='same'))
                 model.add(layers.BatchNormalization())
                 model.add(layers.Activation('relu'))
-                model.add(layers.MaxPooling2D((3,3)))
-                model.add(layers.Conv2D(128, (3,3), padding='same', kernel_regularizer=self.l2))
+                model.add(layers.MaxPooling2D((2,2)))
+                model.add(layers.Conv2D(128, (3,3), padding='same'))
                 model.add(layers.BatchNormalization())
                 model.add(layers.Activation('relu'))
-                model.add(layers.MaxPooling2D((3,3)))
+                model.add(layers.MaxPooling2D((2,2)))
                 match reduction_layer:
                     case 'gap2d':
                         model.add(layers.GlobalAveragePooling2D())

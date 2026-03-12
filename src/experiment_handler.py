@@ -66,3 +66,11 @@ class ExperimentHandler:
         label, score = engine.predict(img_tensor)
         print(f"Result: {label} | Score: {score}")
         return label,score
+
+    def run_evaluation(self, model_path):
+        test_paths, test_labels = self.loader.get_file_lists("data/processed/test")
+        test_ds = self.processor.prepare_dataset(test_paths, test_labels)
+        self.evaluator.evaluate_model(
+            model_path=model_path,
+            test_ds=test_ds
+        )

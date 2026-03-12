@@ -24,33 +24,40 @@ class ModelEvaluator:
         y_pred = []
 
         for images, labels in test_ds:
-            preds = model.predict(images, verbose = 0)
-            y_true.extend(labels.numpy())
-            # Defines a treshold at 0.5
-            y_pred.extend((preds > 0.5).astype(int).flatten())
+            preds = model.predict(images, verbose=0)
+            preds_binary = (preds > 0.5).astype(int).flatten()
+
+
+            for i in range(len(labels)):
+                true_label = int(labels[i].numpy())
+                pred_label = int(preds_binary[i])
+                score = float(preds[i][0])
+
+                if true_label != pred_label:
+                    print(f"True: {true_label} | Pred: {pred_label} | Score: {score:.4f}")
+
+                y_true.append(true_label)
+                y_pred.append(pred_label)
 
         y_true = np.array(y_true)
         y_pred = np.array(y_pred)
 
         print(classification_report(y_true, y_pred, target_names=['DEF', 'OK'], zero_division=0))
 
-        matrix = confusion_matrix(y_true, y_pred)
-
-        plt.figure(figsize=(8,6))
-        sns.heatmap(matrix, annot=True, fmt='d', cmap='Blues',
-                    xticklabels=['Predicted DEF','Predicted OK'],
-                    yticklabels=['Actual DEF','Actual OK'])
-
-        plt.title('Confusion Matrix')
-        plt.ylabel('True label')
-        plt.xlabel('Predicted label')
-
         if save_path:
+            matrix = confusion_matrix(y_true, y_pred)
+
+            plt.figure(figsize=(8, 6))
+            sns.heatmap(matrix, annot=True, fmt='d', cmap='Blues',
+                        xticklabels=['Predicted DEF', 'Predicted OK'],
+                        yticklabels=['Actual DEF', 'Actual OK'])
+
+            plt.title('Confusion Matrix')
+            plt.ylabel('True label')
+            plt.xlabel('Predicted label')
             os.makedirs(os.path.dirname(save_path), exist_ok=True)
             plt.savefig(save_path)
             print(f"Confusion matrix saved to {save_path}")
+            plt.close()
 
-        plt.close()
         return y_true, y_pred
-
-    # TODO: add a GRAD-Cam?

@@ -20,7 +20,7 @@ def main():
     parser = argparse.ArgumentParser(description="Industry 4.0 Cast Defect Detector - Training and Inference")
     parser.add_argument(
         '--mode',
-        choices=['train', 'predict'],
+        choices=['train', 'predict', 'evaluate'],
         default='train',
         help='Mode: train or predict'
     )
@@ -81,6 +81,11 @@ def main():
         if not args.model_path or not args.image_path:
             parser.error(f"Model_path and image_path are required.")
         handler.run_inference(args.model_path, args.image_path)
+
+    elif args.mode == 'evaluate':
+        if not args.model_path:
+            parser.error(f"Model_path is required.")
+        handler.run_evaluation(args.model_path)
 
 if __name__ == "__main__":
     try: main()
