@@ -16,7 +16,7 @@ class ModelEngine:
 
     def compile_model(self, learning_rate=0.0001):
         self.model.compile(
-            optimizer=optimizers.Adam(learning_rate=learning_rate, clipnorm=0.1),
+            optimizer=optimizers.SGD(learning_rate=learning_rate),
             loss=losses.BinaryCrossentropy(),
             metrics=[
                 metrics.BinaryAccuracy(name='accuracy'),
@@ -26,13 +26,13 @@ class ModelEngine:
         )
 
     def train(self, train_ds, val_ds, epochs=10, exp_name="Model"):
-        os.makedirs(f'models', exist_ok=True)
+        os.makedirs(f'models/{exp_name}', exist_ok=True)
         os.makedirs(f'logs/{exp_name}', exist_ok=True)
 
         callbacks = [
             EpochTimer(),
             tf.keras.callbacks.ModelCheckpoint(
-                filepath=f'models/{exp_name}.keras',
+                filepath=f'models/{exp_name}/weights_{exp_name}.keras',
                 monitor='val_loss',
                 save_best_only=True,
                 verbose=1
@@ -62,9 +62,9 @@ class ModelEngine:
     def load_model(self, model_path):
         self.model = tf.keras.models.load_model(model_path)
 
-    def predict(self, img_tensor):
+    def predict(self, img_tensor, threshold=0.5):
         img_array = tf.expand_dims(img_tensor, 0)
         prediction = self.model.predict(img_array, verbose=0)
         score = prediction[0][0]
-        label = "OK" if score > 0.5 else "DEF"
+        label = "OK" if score > threshold else "DEF"
         return label, score

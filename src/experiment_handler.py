@@ -5,7 +5,7 @@ from src.model.builder import ModelBuilder
 from src.model.engine import ModelEngine
 from src.utils.evaluator import ModelEvaluator
 from src.utils.plotter import Plotter
-import os
+from pathlib import Path
 
 
 class ExperimentHandler:
@@ -48,12 +48,14 @@ class ExperimentHandler:
             engine.compile_model(learning_rate=self.config.get('lr', 0.0001))
             engine.train(train_ds, val_ds, epochs=self.epochs, exp_name=exp['name'])
 
-            model_path = f"models/{exp['name']}.keras"
+            model_path = f"models/{exp['name']}/weights_{exp['name']}.keras"
             matrix_path = f"logs/{exp['name']}/confusion_matrix.png"
+            threshold_path = f"models/{exp['name']}/threshold_{exp['name']}.txt"
             self.evaluator.evaluate_model(
                 model_path=model_path,
                 test_ds=test_ds,
-                save_path=matrix_path
+                save_path=matrix_path,
+                threshold_path=threshold_path
             )
         self.plotter.plot_results(experiments)
 
@@ -61,9 +63,18 @@ class ExperimentHandler:
         engine = ModelEngine()
         engine.load_model(model_path)
 
+        threshold_path = model_path.replace(".keras", ".txt").replace("weights", "threshold")
+
+        try:
+            with open(threshold_path, 'r') as f:
+                threshold = float(f.read().strip())
+        except FileNotFoundError:
+            print(f"Threshold of {model_path} not found. Set it to 0.5.")
+            threshold = 0.5
+
         img_tensor, _ = self.processor.load_and_resize(image_path, label = 0)
 
-        label, score = engine.predict(img_tensor)
+        label, score = engine.predict(img_tensor, threshold = threshold)
         print(f"Result: {label} | Score: {score}")
         return label,score
 
@@ -74,3 +85,31 @@ class ExperimentHandler:
             model_path=model_path,
             test_ds=test_ds
         )
+
+    def run_folder_inference(self, model_path, folder_path):
+        engine = ModelEngine()
+        engine.load_model(model_path)
+
+        threshold_path = model_path.replace(".keras", ".txt").replace("weights", "threshold")
+        try:
+            with open(threshold_path, 'r') as f:
+                threshold = float(f.read().strip())
+        except FileNotFoundError:
+            print(f"Threshold of {model_path} not found. Set it to 0.5.")
+            threshold = 0.5
+        image_paths = list(Path(folder_path).glob('*.jpeg'))
+        if not image_paths:
+            print(f"No .jpeg images found in {folder_path}.")
+            return
+
+        print(f"Prediction of {len(image_paths)} images. (Threshold: {threshold:.4f})...")
+        results = {'DEF': 0, 'OK': 0}
+
+        for img_path in image_paths:
+            img_tensor, _ = self.processor.load_and_resize(str(img_path), label=0)
+            label, score = engine.predict(img_tensor, threshold=threshold)
+            results[label] += 1
+        print(f"Total: {len(image_paths)}")
+        print(f"OK ratio: {results['OK'] / len(image_paths)}% ({results['OK']} / {len(image_paths)})")
+        print(f"DEF ratio: {results['DEF'] / len(image_paths)}% ({results['DEF']} / {len(image_paths)})")
+        return results

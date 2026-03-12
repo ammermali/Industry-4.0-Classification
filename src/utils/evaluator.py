@@ -2,7 +2,7 @@ import tensorflow as tf
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
-from sklearn.metrics import confusion_matrix, classification_report
+from sklearn.metrics import confusion_matrix, classification_report, precision_recall_curve
 import os
 
 # Component the evaluate the model performance on the testing dataset.
@@ -11,8 +11,13 @@ class ModelEvaluator:
     def __init__(self, target_names=['DEF', 'OK']):
         self.target_names = target_names
 
+    def find_optimal_threshold(self, y_true, y_scores):
+        precision, recall, thresholds = precision_recall_curve(y_true, y_scores)
+        f1_scores = 2 * (precision * recall) / (np.maximum(precision + recall, 1e-10))
+        best_idx = np.argmax(f1_scores)
+        return thresholds[best_idx]
 
-    def evaluate_model(self, model_path, test_ds, save_path = None):
+    def evaluate_model(self, model_path, test_ds, save_path = None, threshold_path = None):
         if not os.path.exists(model_path):
             print("Model not found")
             return
@@ -25,22 +30,21 @@ class ModelEvaluator:
 
         for images, labels in test_ds:
             preds = model.predict(images, verbose=0)
-            preds_binary = (preds > 0.5).astype(int).flatten()
-
-
-            for i in range(len(labels)):
-                true_label = int(labels[i].numpy())
-                pred_label = int(preds_binary[i])
-                score = float(preds[i][0])
-
-                if true_label != pred_label:
-                    print(f"True: {true_label} | Pred: {pred_label} | Score: {score:.4f}")
-
-                y_true.append(true_label)
-                y_pred.append(pred_label)
+            y_pred.extend(preds.flatten())
+            y_true.extend(labels.numpy())
 
         y_true = np.array(y_true)
         y_pred = np.array(y_pred)
+
+        threshold = self.find_optimal_threshold(y_true, y_pred)
+
+        print(threshold)
+
+        if threshold_path:
+            with open(threshold_path, 'w') as f:
+                f.write(str(threshold))
+
+        y_pred = (y_pred > threshold).astype(int)
 
         print(classification_report(y_true, y_pred, target_names=['DEF', 'OK'], zero_division=0))
 

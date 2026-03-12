@@ -10,7 +10,7 @@ class DataProcessor():
     def load_and_resize(self, file_path, label):
         img = tf.io.read_file(file_path)
         img = tf.image.decode_jpeg(img, channels=1)
-        img = tf.image.resize(img, self.img_size)
+        img = tf.image.resize(img, self.img_size, antialias=True)
         img = tf.cast(img, tf.float32) / 255.0
         return img, label
 
@@ -26,7 +26,7 @@ class DataProcessor():
             )
         ])
 
-    def prepare_dataset(self, file_paths, labels, augment=True, shuffle=True):
+    def prepare_dataset(self, file_paths, labels, augment=False, shuffle=True):
         ds = tf.data.Dataset.from_tensor_slices((file_paths, labels))
         ds = ds.map(
             lambda x,y: self.load_and_resize(x,y),
