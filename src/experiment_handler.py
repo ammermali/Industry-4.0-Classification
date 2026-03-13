@@ -80,12 +80,13 @@ class ExperimentHandler:
         print(f"Result: {label} | Score: {score}")
         return label,score
 
-    def run_evaluation(self, model_path):
+    def run_evaluation(self, model_path, save_path):
         test_paths, test_labels = self.loader.get_file_lists("data/processed/test")
         test_ds = self.processor.prepare_dataset(test_paths, test_labels)
         self.evaluator.evaluate_model(
             model_path=model_path,
-            test_ds=test_ds
+            test_ds=test_ds,
+            save_path=save_path
         )
 
     def run_folder_inference(self, model_path, folder_path):

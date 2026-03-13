@@ -10,7 +10,7 @@ from tensorflow.keras import mixed_precision
 def main():
     # Experiments
     experiments = [
-    #    {'name': 'ModelA', 'arch': 'mlp', 'red': None},
+        {'name': 'ModelA', 'arch': 'mlp', 'red': None},
         {'name': 'ModelB', 'arch': 'cnn', 'red': 'gap2d'},
         {'name': 'ModelC', 'arch': 'cnn', 'red': 'gmp2d'},
         {'name': 'ModelD', 'arch': 'cnn', 'red': 'flatten'},
@@ -43,9 +43,8 @@ def main():
         help='No. of epochs for training mode.'
     )
     parser.add_argument(
-        '--model_path',
+        '--model_name',
         type=str,
-        default='models/ModelC.keras', # set the best model as the default one
         help="Path of the chosen model for inference. Only for predict mode."
     )
     parser.add_argument(
@@ -88,22 +87,25 @@ def main():
             print("Training with mixed precision.")
 
     elif args.mode == 'predict':
-        if not args.model_path:
+        if not args.model_name:
             parser.error("Model_path is required for predict mode.")
+        model_path = f"models/{args.model_name}/weights_{args.model_name}.keras"
         if args.folder_path:
-            handler.run_folder_inference(args.model_path, args.folder_path)
+            handler.run_folder_inference(model_path, args.folder_path)
         elif args.image_path:
-            handler.run_inference(args.model_path, args.image_path)
+            handler.run_inference(model_path, args.image_path)
         else:
             parser.error("You must provide either --image_path or --folder_path for predict mode.")
 
     elif args.mode == 'evaluate':
-        if not args.model_path:
+        if not args.model_name:
             parser.error(f"Model_path is required.")
-        handler.run_evaluation(args.model_path)
+        model_path = f"models/{args.model_name}/weights_{args.model_name}.keras"
+        handler.run_evaluation(model_path, save_path = f"logs/{args.model_name}/confusion_matrix_{args.model_name}.png")
 
     elif args.mode == 'original_evaluation':
-        handler.run_original_evaluation(args.model_path)
+        model_path = f"models/{args.model_name}/weights_{args.model_name}.keras"
+        handler.run_original_evaluation(model_path)
 
 if __name__ == "__main__":
     try: main()

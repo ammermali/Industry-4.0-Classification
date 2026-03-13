@@ -2,7 +2,7 @@ import tensorflow as tf
 import numpy as np
 import matplotlib.pyplot as plt
 import seaborn as sns
-from sklearn.metrics import confusion_matrix, classification_report, precision_recall_curve
+from sklearn.metrics import confusion_matrix, classification_report, roc_curve
 import os
 
 # Component the evaluate the model performance on the testing dataset.
@@ -12,9 +12,9 @@ class ModelEvaluator:
         self.target_names = target_names
 
     def find_optimal_threshold(self, y_true, y_scores):
-        precision, recall, thresholds = precision_recall_curve(y_true, y_scores)
-        f1_scores = 2 * (precision * recall) / (np.maximum(precision + recall, 1e-10))
-        best_idx = np.argmax(f1_scores)
+        fpr, tpr, thresholds = roc_curve(y_true, y_scores)
+        j = tpr - fpr
+        best_idx = np.argmax(j)
         return thresholds[best_idx]
 
     def evaluate_model(self, model_path, test_ds, save_path = None, threshold_path = None):
