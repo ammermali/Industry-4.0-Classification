@@ -11,41 +11,41 @@ def main():
     # Experiments
     experiments = [
     #    {'name': 'ModelA', 'arch': 'mlp', 'red': None},
-    #    {'name': 'ModelB', 'arch': 'cnn', 'red': 'gap2d'},
+        {'name': 'ModelB', 'arch': 'cnn', 'red': 'gap2d'},
         {'name': 'ModelC', 'arch': 'cnn', 'red': 'gmp2d'},
-    #    {'name': 'ModelD', 'arch': 'cnn', 'red': 'flatten'},
+        {'name': 'ModelD', 'arch': 'cnn', 'red': 'flatten'},
     ]
 
     # Args
     parser = argparse.ArgumentParser(description="Industry 4.0 Cast Defect Detector - Training and Inference")
     parser.add_argument(
         '--mode',
-        choices=['train', 'predict', 'evaluate'],
+        choices=['train', 'predict', 'evaluate', 'original_evaluation'],
         default='train',
         help='Mode: train or predict'
     )
     parser.add_argument(
         '--batch_size',
         type=int,
-        default=64,
+        default=16,
         help='Batch size for training mode.'
     )
     parser.add_argument(
         '--lr',
         type=float,
-        default=0.0001,
+        default=0.01,
         help='Learning rate for training mode.'
     )
     parser.add_argument(
         '--epochs',
         type=int,
-        default=10,
+        default=20,
         help='No. of epochs for training mode.'
     )
     parser.add_argument(
         '--model_path',
         type=str,
-        default='models/ModelC.keras',
+        default='models/ModelC.keras', # set the best model as the default one
         help="Path of the chosen model for inference. Only for predict mode."
     )
     parser.add_argument(
@@ -101,6 +101,9 @@ def main():
         if not args.model_path:
             parser.error(f"Model_path is required.")
         handler.run_evaluation(args.model_path)
+
+    elif args.mode == 'original_evaluation':
+        handler.run_original_evaluation(args.model_path)
 
 if __name__ == "__main__":
     try: main()

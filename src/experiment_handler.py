@@ -6,6 +6,8 @@ from src.model.engine import ModelEngine
 from src.utils.evaluator import ModelEvaluator
 from src.utils.plotter import Plotter
 from pathlib import Path
+import matplotlib.pyplot as plt
+import seaborn as sns
 
 
 class ExperimentHandler:
@@ -113,3 +115,28 @@ class ExperimentHandler:
         print(f"OK ratio: {results['OK'] / len(image_paths)}% ({results['OK']} / {len(image_paths)})")
         print(f"DEF ratio: {results['DEF'] / len(image_paths)}% ({results['DEF']} / {len(image_paths)})")
         return results
+
+    def run_original_evaluation(self, model_path, ok_folder = 'data/original/ok_front', def_folder = 'data/original/def_front'):
+        print("OK Folder")
+        results_ok = self.run_folder_inference(model_path, ok_folder)
+        print("DEF Folder")
+        results_def = self.run_folder_inference(model_path, def_folder)
+        if not results_ok or not results_def:
+            print("Not possible to generate the matrix.")
+            return
+        cm = [
+            [results_def['DEF'], results_def['OK']],
+            [results_ok['DEF'], results_ok['OK']]
+        ]
+
+
+        plt.figure(figsize=(8, 6))
+        sns.heatmap(cm, annot=True, fmt='d', cmap='Blues',
+                    xticklabels=['Predicted DEF', 'Predicted OK'],
+                    yticklabels=['Actual DEF', 'Actual OK'])
+
+        plt.title('Original Data - Confusion Matrix')
+        plt.ylabel('True label')
+        plt.xlabel('Predicted label')
+
+        plt.show()
