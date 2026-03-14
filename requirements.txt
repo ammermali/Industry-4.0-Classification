@@ -1,4 +1,6 @@
 tensorflow
-sklearn
 numpy
+pandas
+matplotlib
 seaborn
+scikit-learn
