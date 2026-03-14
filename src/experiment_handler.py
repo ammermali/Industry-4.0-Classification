@@ -22,7 +22,7 @@ class ExperimentHandler:
         self.evaluator = ModelEvaluator()
         self.epochs = config.get('epochs', 10)
 
-    def run_experiments(self, experiments):
+    def run_experiments(self, experiments, augment=False):
         paths, labels = self.loader.get_file_lists("data/processed/train")
 
         if not paths:
@@ -34,7 +34,7 @@ class ExperimentHandler:
         )
         test_paths, test_labels = self.loader.get_file_lists("data/processed/test")
 
-        train_ds = self.processor.prepare_dataset(train_paths, train_labels)
+        train_ds = self.processor.prepare_dataset(train_paths, train_labels, augment=augment)
         val_ds = self.processor.prepare_dataset(val_paths, val_labels)
         test_ds = self.processor.prepare_dataset(test_paths, test_labels)
 

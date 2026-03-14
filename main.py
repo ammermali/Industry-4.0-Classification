@@ -43,6 +43,12 @@ def main():
         help='No. of epochs for training mode.'
     )
     parser.add_argument(
+        '--augment',
+        type=bool,
+        default=False,
+        help="Decide if the training set should be augmented or not."
+    )
+    parser.add_argument(
         '--model_name',
         type=str,
         help="Path of the chosen model for inference. Only for predict mode."
@@ -80,7 +86,7 @@ def main():
 
     if args.mode == "train":
         print(f"Starting training for {len(experiments)} experiments.")
-        handler.run_experiments(experiments)
+        handler.run_experiments(experiments, args.augment)
         if args.mp:
             policy = mixed_precision.Policy('mixed_float16')
             mixed_precision.set_global_policy(policy)
